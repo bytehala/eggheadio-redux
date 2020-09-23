@@ -62,9 +62,23 @@ const FilterLink = ({filter, children}) => {
   )
 }
 
+const getVisibleTodos = (todos, filter) => {
+  switch(filter) {
+    case 'SHOW_ALL':
+      return todos;
+    case 'SHOW_COMPLETED':
+      return todos.filter(t => t.completed)
+    case 'SHOW_ACTIVE':
+      return todos.filter(t => !t.completed)
+    default:
+      return todos;
+  }
+}
+
 let todoIndex = 0;
 class TodoApp extends Component {
   render() {
+    const visibleTodos = getVisibleTodos(this.props.todos, this.props.visibilityFilter)
     return (
       <div>
         <input
@@ -87,7 +101,7 @@ class TodoApp extends Component {
         </button>
         
         <ul>
-          {this.props.todos.map((td) => (
+          {visibleTodos.map((td) => (
             <li
               key={td.id}
               onClick={() => {
@@ -120,7 +134,7 @@ function render() {
 
   ReactDOM.render(
     <div>
-      <TodoApp todos={store.getState().todos} />
+      <TodoApp todos={store.getState().todos} visibilityFilter={store.getState().visibilityFilter}/>
     </div>,
     document.getElementById("root")
   );
