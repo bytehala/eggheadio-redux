@@ -37,7 +37,6 @@ const todos = (state = [], action) => {
 };
 
 const visibilityFilter = (state = "SHOW_ALL", action) => {
-  console.log(action.filter);
   switch (action.type) {
     case "SET_VISIBILITY_FILTER":
       return action.filter;
@@ -49,7 +48,8 @@ const visibilityFilter = (state = "SHOW_ALL", action) => {
 const todoApp = combineReducers({ todos, visibilityFilter });
 const store = createStore(todoApp);
 
-const FilterLink = ({filter, children}) => {
+const FilterLink = ({filter, currentFilter, children}) => {
+  if (currentFilter !== filter)
   return (
     <a href='#'
      onClick={e => {
@@ -59,6 +59,12 @@ const FilterLink = ({filter, children}) => {
          filter
        })
      }}>{children}</a>
+  )
+
+  return (
+    <span>
+      {children}
+    </span>
   )
 }
 
@@ -75,10 +81,23 @@ const getVisibleTodos = (todos, filter) => {
   }
 }
 
+const Todo = ({text, completed, onClick}) => {
+  return (
+  <li
+              // key={td.id}
+              onClick={onClick()}
+              style={{
+                textDecoration: completed? 'line-through' : 'none'
+              }}
+            >{text}</li>
+  )
+}
+
 let todoIndex = 0;
 class TodoApp extends Component {
   render() {
-    const visibleTodos = getVisibleTodos(this.props.todos, this.props.visibilityFilter)
+    const {todos, visibilityFilter} = this.props
+    const visibleTodos = getVisibleTodos(todos, visibilityFilter)
     return (
       <div>
         <input
@@ -102,27 +121,19 @@ class TodoApp extends Component {
         
         <ul>
           {visibleTodos.map((td) => (
-            <li
-              key={td.id}
-              onClick={() => {
-                store.dispatch({ type: "TOGGLE_TODO", id: td.id });
-              }}
-              style={{
-                textDecoration: td.completed? 'line-through' : 'none'
-              }}
-            >
-              {td.text}
-            </li>
+            <Todo onClick={
+              store.dispatch({ type: "TOGGLE_TODO", id: td.id })
+            } completed={td.completed} text={td.text} />
           ))}
         </ul>
 
         <p>
           Show: {' '}
-          <FilterLink filter='SHOW_ALL'>All</FilterLink>
+          <FilterLink filter='SHOW_ALL' currentFilter={visibilityFilter}>All</FilterLink>
           {' '}
-          <FilterLink filter='SHOW_COMPLETED'>Completed</FilterLink>
+          <FilterLink filter='SHOW_COMPLETED' currentFilter={visibilityFilter}>Completed</FilterLink>
           {' '}
-          <FilterLink filter='SHOW_ACTIVE'>Active</FilterLink>
+          <FilterLink filter='SHOW_ACTIVE' currentFilter={visibilityFilter}>Active</FilterLink>
           {' '}
         </p>
       </div>
@@ -134,7 +145,7 @@ function render() {
 
   ReactDOM.render(
     <div>
-      <TodoApp todos={store.getState().todos} visibilityFilter={store.getState().visibilityFilter}/>
+      <TodoApp {...store.getState()} />
     </div>,
     document.getElementById("root")
   );
