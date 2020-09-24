@@ -133,7 +133,7 @@ class TodoApp extends Component {
         
         <TodoList todos={visibleTodos} onTodoClick={
           (id) => {
-            store.dispatch({ type: "TOGGLE_TODO", id: id })
+            store.dispatch({ type: "TOGGLE_TODO", id })
           }
         } />
         
