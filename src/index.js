@@ -98,7 +98,7 @@ const TodoList = ({todos, onTodoClick}) => {
     <ul>
           {todos.map((td) => (
             <Todo key={td.id} onClick={() => onTodoClick(td.id)}
-              completed={td.completed} text={td.text}
+              {...td}
             />
           ))}
         </ul>
