@@ -67,6 +67,16 @@ const Link = ({ active, onClick, children }) => {
 
 class FilterLink extends Component {
 
+  onComponentDidmount() {
+    this.unsubscribe = store.subscribe(() => {
+      this.forceUpdate()
+    })
+  }
+
+  onComponentWillUnmount() {
+    this.unsubscribe()
+  }
+
   render() {
     const { filter, children } = this.props;
     // Before FilterLink subscribing to store:
