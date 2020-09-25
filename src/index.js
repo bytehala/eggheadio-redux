@@ -156,7 +156,7 @@ const AddTodo = ({ onAddTodoClick }) => {
   );
 };
 
-const Footer = ({ visibilityFilter }) => {
+const Footer = () => {
   return (
     <p>
       Show: <FilterLink filter="SHOW_ALL">All</FilterLink>{" "}
@@ -188,7 +188,7 @@ const TodoApp = ({ todos, visibilityFilter }) => {
         }}
       />
 
-      <Footer visibilityFilter={visibilityFilter} />
+      <Footer />
     </div>
   );
 };
