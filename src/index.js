@@ -65,6 +65,9 @@ const Link = ({ active, onClick, children }) => {
   return <span>{children}</span>;
 };
 
+// This allows you to use FilterLink in other places
+// without having to pass a whole lot of props from its parent
+// It makes FilterLink plug-and-play
 class FilterLink extends Component {
 
   onComponentDidmount() {
@@ -79,9 +82,6 @@ class FilterLink extends Component {
 
   render() {
     const { filter, children } = this.props;
-    // Before FilterLink subscribing to store:
-    // This is okay because we update the whole app when the store updates
-    // This is inefficient, we can just update FilterLink
     const visibilityFilter = store.getState().visibilityFilter;
     return (
       <Link
