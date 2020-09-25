@@ -166,6 +166,33 @@ const Footer = () => {
   );
 };
 
+class VisibleTodoList extends Component {
+  
+  onComponentDidmount() {
+    this.unsubscribe = store.subscribe(() => {
+      this.forceUpdate()
+    })
+  }
+
+  onComponentWillUnmount() {
+    this.unsubscribe()
+  }
+
+  render() {
+
+    const {todos, visibilityFilter} = store.getState()
+
+    return(
+      <TodoList
+        todos={getVisibleTodos(todos, visibilityFilter)}
+        onTodoClick={(id) => {
+          store.dispatch({ type: "TOGGLE_TODO", id });
+        }}
+      />
+    )
+  }
+}
+
 let todoIndex = 0;
 const TodoApp = ({ todos, visibilityFilter }) => {
   return (
@@ -181,12 +208,7 @@ const TodoApp = ({ todos, visibilityFilter }) => {
         }}
       />
 
-      <TodoList
-        todos={getVisibleTodos(todos, visibilityFilter)}
-        onTodoClick={(id) => {
-          store.dispatch({ type: "TOGGLE_TODO", id });
-        }}
-      />
+      <VisibleTodoList />
 
       <Footer />
     </div>
