@@ -2,6 +2,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { combineReducers, createStore } from "redux";
+import { PropTypes } from "prop-types";
 
 const todo = (state = {}, action) => {
   switch (action.type) {
@@ -45,8 +46,6 @@ const visibilityFilter = (state = "SHOW_ALL", action) => {
   }
 };
 
-const todoApp = combineReducers({ todos, visibilityFilter });
-const store = createStore(todoApp);
 
 const Link = ({ active, onClick, children }) => {
   if (active)
@@ -71,6 +70,7 @@ const Link = ({ active, onClick, children }) => {
 class FilterLink extends Component {
 
   componentDidMount() {
+    const {store} = this.context
     this.unsubscribe = store.subscribe(() => {
       this.forceUpdate()
     })
@@ -82,6 +82,7 @@ class FilterLink extends Component {
 
   render() {
     const { filter, children } = this.props;
+    const {store} = this.context
     const visibilityFilter = store.getState().visibilityFilter;
     return (
       <Link
@@ -98,6 +99,8 @@ class FilterLink extends Component {
     );
   }
 }
+FilterLink.contextTypes = {store: PropTypes.object}
+
 
 const getVisibleTodos = (todos, filter) => {
   switch (filter) {
@@ -135,7 +138,7 @@ const TodoList = ({ todos, onTodoClick }) => {
   );
 };
 
-const AddTodo = () => {
+const AddTodo = (props, {store}) => {
   let input;
   return (
     <div>
@@ -162,7 +165,8 @@ const AddTodo = () => {
       </button>
     </div>
   );
-};
+}
+AddTodo.contextTypes = {store: PropTypes.object}
 
 const Footer = () => {
   return (
@@ -177,6 +181,7 @@ const Footer = () => {
 class VisibleTodoList extends Component {
   
   componentDidMount() {
+    const {store} = this.context
     this.unsubscribe = store.subscribe(() => {
       this.forceUpdate()
     })
@@ -187,7 +192,7 @@ class VisibleTodoList extends Component {
   }
 
   render() {
-
+    const {store} = this.context
     const {todos, visibilityFilter} = store.getState()
 
     return(
@@ -200,6 +205,7 @@ class VisibleTodoList extends Component {
     )
   }
 }
+VisibleTodoList.contextTypes = {store: PropTypes.object}
 
 let todoIndex = 0;
 const TodoApp = () => {
@@ -212,9 +218,26 @@ const TodoApp = () => {
   );
 };
 
+class Provider extends Component {
+
+  getChildContext() {
+    return {
+      store: this.props.store
+    }
+  }
+
+  render() {
+    return this.props.children
+  }
+}
+Provider.childContextTypes = {store: PropTypes.object}
+
+const todoApp = combineReducers({ todos, visibilityFilter });
+
+
 ReactDOM.render(
-  <div>
+  <Provider store={createStore(todoApp)}>
     <TodoApp />
-  </div>,
+  </Provider>,
   document.getElementById("root")
 );
